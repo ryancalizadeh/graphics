@@ -1,15 +1,33 @@
-#include <iostream>
+//
+// Copyright (c) 2013 Mikko Mononen memon@inside.org
+//
+// This software is provided 'as-is', without any express or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//    misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+//
+
+#include <stdio.h>
 #ifdef NANOVG_GLEW
 #  include <GL/glew.h>
 #endif
 #define GLFW_INCLUDE_GLEXT
 #include <GLFW/glfw3.h>
-#include "nanovg-master/src/nanovg.h"
+#include "nanovg.h"
 #define NANOVG_GL2_IMPLEMENTATION
-#include "nanovg-master/src/nanovg_gl.h"
-#include "nanovg-master/example/perf.h"
-#include <vector>
-#include "Vector3.h"
+#include "nanovg_gl.h"
+#include "demo.h"
+#include "perf.h"
+
 
 void errorcb(int error, const char* desc)
 {
@@ -37,6 +55,7 @@ static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 int main()
 {
 	GLFWwindow* window;
+	DemoData data;
 	NVGcontext* vg = NULL;
 	PerfGraph fps;
 	double prevt = 0;
@@ -83,17 +102,13 @@ int main()
 		return -1;
 	}
 
+	if (loadDemoData(vg, &data) == -1)
+		return -1;
+
 	glfwSwapInterval(0);
 
 	glfwSetTime(0);
 	prevt = glfwGetTime();
-
-	Vector3 *p1 = new Vector3(100, 100, 0);
-	Vector3 *p2 = new Vector3(200, 100, 0);
-	Vector3 *p3 = new Vector3(100, 200, 0);
-
-	std::vector<Vector3 *> points = {p1, p2, p3};
-	Vector3 *mouse = new Vector3();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -108,8 +123,6 @@ int main()
 		updateGraph(&fps, dt);
 
 		glfwGetCursorPos(window, &mx, &my);
-		mouse->x = mx;
-		mouse->y = my;
 		glfwGetWindowSize(window, &winWidth, &winHeight);
 		glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 
@@ -126,31 +139,21 @@ int main()
 
 		nvgBeginFrame(vg, winWidth, winHeight, pxRatio);
 
+		renderDemo(vg, mx,my, winWidth,winHeight, t, blowup, &data);
 		renderGraph(vg, 5,5, &fps);
-
-		points[0]->x = mouse->x; points[0]->y = mouse->y;
-		points[1]->x = mouse->x + 100; points[1]->y = mouse->y;
-		points[2]->x = mouse->x; points[2]->y = mouse->y + 100;
-
-		nvgBeginPath(vg);
-		
-		nvgMoveTo(vg, points[0]->x, points[0]->y);
-		nvgLineTo(vg, points[1]->x, points[1]->y);
-		nvgLineTo(vg, points[2]->x, points[2]->y);
-
-
-		nvgFill(vg);
 
 		nvgEndFrame(vg);
 
 		if (screenshot) {
 			screenshot = 0;
-			std::cout << "screenshot taken" << std::endl;
+			saveScreenShot(fbWidth, fbHeight, premult, "dump.png");
 		}
 		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	freeDemoData(vg, &data);
 
 	nvgDeleteGL2(vg);
 
