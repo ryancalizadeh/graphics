@@ -4,9 +4,7 @@
 
 class Vector3 {
     public:
-    double x;
-    double y;
-    double z;
+    double x, y, z;
 
     // Constructors
     Vector3();
@@ -15,6 +13,7 @@ class Vector3 {
     Vector3* clone();
     Vector3* crossVector(Vector3 *other);
     Vector3* addVector(Vector3 *other);
+    Vector3* subVector(Vector3 *other);
     Vector3* multScalarVector(double scalar);
     Vector3* projVector(Vector3 *other);
 
@@ -28,6 +27,7 @@ class Vector3 {
     double lengthSq();
     double dot(Vector3 *other);
     double scalarProj(Vector3 *other);
+    double dist(Vector3 *other);
 };
 
 Vector3::Vector3() {
@@ -53,6 +53,22 @@ Vector3* Vector3::addVector(Vector3 *other) {
         this->x + other->x,
         this->y + other->y,
         this->z + other->z
+    );
+}
+
+Vector3* Vector3::subVector(Vector3 *other) {
+    return new Vector3(
+        this->x - other->x,
+        this->y - other->y,
+        this->z - other->z
+    );
+}
+
+double Vector3::dist(Vector3* other) {
+    std::sqrt(
+        std::pow(this->x - other->x, 2) +
+        std::pow(this->y - other->y, 2) +
+        std::pow(this->z - other->z, 2)
     );
 }
 
