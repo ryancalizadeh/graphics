@@ -56,7 +56,7 @@ solution "nanovg"
 
 		kind "ConsoleApp"
 		language "C++"
-		files { "example/example_gl2.c", "example/demo.c", "example/perf.c" }
+		files { "../main.cpp", "example/demo.c", "example/perf.c" }
 		includedirs { "src", "example" }
 		targetdir("build")
 		links { "nanovg" }
