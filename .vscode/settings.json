@@ -1,6 +1,0 @@
-{
-    "files.associations": {
-        "new": "cpp",
-        "glfw3.h": "c"
-    }
-}
