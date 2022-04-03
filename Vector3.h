@@ -1,6 +1,9 @@
 #ifndef VECTOR3_H
 #define VECTOR3_H
 #include <cmath>
+#include <memory>
+
+using std::unique_ptr;
 
 class Vector3 {
     public:
@@ -9,25 +12,27 @@ class Vector3 {
     // Constructors
     Vector3();
     Vector3(double x, double y, double z);
-    Vector3* normalizeVector();
-    Vector3* clone();
-    Vector3* crossVector(Vector3 *other);
-    Vector3* addVector(Vector3 *other);
-    Vector3* subVector(Vector3 *other);
-    Vector3* multScalarVector(double scalar);
-    Vector3* projVector(Vector3 *other);
+
+    // Generators
+    unique_ptr<Vector3> normalizeVector();
+    unique_ptr<Vector3> clone();
+    unique_ptr<Vector3> crossVector(unique_ptr<Vector3> &other);
+    unique_ptr<Vector3> addVector(unique_ptr<Vector3> &other);
+    unique_ptr<Vector3> subVector(unique_ptr<Vector3> &other);
+    unique_ptr<Vector3> multScalarVector(double scalar);
+    unique_ptr<Vector3> projVector(unique_ptr<Vector3> &other);
 
     // Modifiers
-    void add(Vector3 *other);
+    void add(unique_ptr<Vector3> &other);
     void multScalar(double scalar);
     void normalize();
 
     // Getters
     double length();
     double lengthSq();
-    double dot(Vector3 *other);
-    double scalarProj(Vector3 *other);
-    double dist(Vector3 *other);
+    double dot(unique_ptr<Vector3> &other);
+    double scalarProj(unique_ptr<Vector3> &other);
+    double dist(unique_ptr<Vector3> &other);
 };
 
 Vector3::Vector3() {
@@ -36,50 +41,50 @@ Vector3::Vector3() {
     z = 0.0;
 }
 
-Vector3::Vector3(double _x, double _y, double _z) {
-    x = _x;
-    y = _y;
-    z = _z;
+Vector3::Vector3(double x_, double y_, double z_) {
+    x = x_;
+    y = y_;
+    z = z_;
 }
 
-void Vector3::add(Vector3 *other) {
+void Vector3::add(unique_ptr<Vector3> &other) {
     this->x += other->x;
     this->y += other->y;
     this->z += other->z;
 }
 
-Vector3* Vector3::addVector(Vector3 *other) {
-    return new Vector3(
+unique_ptr<Vector3> Vector3::addVector(unique_ptr<Vector3> &other) {
+    return std::make_unique<Vector3>(
         this->x + other->x,
         this->y + other->y,
         this->z + other->z
     );
 }
 
-Vector3* Vector3::subVector(Vector3 *other) {
-    return new Vector3(
+unique_ptr<Vector3> Vector3::subVector(unique_ptr<Vector3> &other) {
+    return std::make_unique<Vector3>(
         this->x - other->x,
         this->y - other->y,
         this->z - other->z
     );
 }
 
-double Vector3::dist(Vector3* other) {
-    std::sqrt(
+double Vector3::dist(unique_ptr<Vector3> &other) {
+    return std::sqrt(
         std::pow(this->x - other->x, 2) +
         std::pow(this->y - other->y, 2) +
         std::pow(this->z - other->z, 2)
     );
 }
 
-double Vector3::dot(Vector3 *other) {
+double Vector3::dot(unique_ptr<Vector3> &other) {
     return  this->x * other->x +
             this->y * other->y +
             this->z * other->z;
 }
 
-Vector3* Vector3::crossVector(Vector3 *other) {
-    return new Vector3(
+unique_ptr<Vector3> Vector3::crossVector(unique_ptr<Vector3> &other) {
+    return std::make_unique<Vector3>(
         this->y * other->z - this->z * other->y,
         this->z * other->x - this->x * other->z,
         this->x * other->y - this->y * other->x
@@ -91,13 +96,13 @@ void Vector3::normalize() {
     this->multScalar(1 / len);
 }
 
-Vector3* Vector3::normalizeVector() {
+unique_ptr<Vector3> Vector3::normalizeVector() {
     double len = this->length();
     return this->multScalarVector(1 / len);
 }
 
-Vector3* Vector3::clone() {
-    return new Vector3(this->x, this->y, this->z);
+unique_ptr<Vector3> Vector3::clone() {
+    return std::make_unique<Vector3>(this->x, this->y, this->z);
 }
 
 double Vector3::length() {
@@ -116,29 +121,29 @@ void Vector3::multScalar(double scalar) {
     this->z *= scalar;
 }
 
-Vector3* Vector3::multScalarVector(double scalar) {
-    return new Vector3(
+unique_ptr<Vector3> Vector3::multScalarVector(double scalar) {
+    return std::make_unique<Vector3>(
         this->x * scalar,
         this->y * scalar,
         this->z * scalar
     );
 }
 
-Vector3* Vector3::projVector(Vector3 *other) {
-    Vector3 *newVector3 = other->clone();
+unique_ptr<Vector3> Vector3::projVector(unique_ptr<Vector3> &other) {
+    unique_ptr<Vector3> newVector3 = other->clone();
     newVector3->multScalar(
         this->dot(other) / other->lengthSq()
     );
     return newVector3;
 }
 
-double Vector3::scalarProj(Vector3 *other) {
+double Vector3::scalarProj(unique_ptr<Vector3> &other) {
     return this->dot(other) / other->length();
 }
 
 #endif
 
 // TODO
-//  Memory Management
 //  Organize implementations
 //  
+
