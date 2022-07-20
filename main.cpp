@@ -113,7 +113,7 @@ int main()
 		glfwGetWindowSize(window, &winWidth, &winHeight);
 		glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 
-		// Calculate pixel ration for hi-dpi devices.
+		// Calculate pixel ratio for hi-dpi devices.
 		pxRatio = (float)fbWidth / (float)winWidth;
 
 		// Update and render
